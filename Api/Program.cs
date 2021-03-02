@@ -31,7 +31,7 @@ namespace Api
             catch (Exception ex)
             {
                 var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex,"an error has occured during migration. please fit it.");
+                logger.LogError(ex,"an error has occured during migration. please fix it.");
             }
 
            await host.RunAsync();
