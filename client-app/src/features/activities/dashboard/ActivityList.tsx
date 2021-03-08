@@ -1,28 +1,25 @@
-import React, { SyntheticEvent, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { SyntheticEvent, useState } from 'react';
 import { Button, Item, Label, Segment } from 'semantic-ui-react';
-import { Activity } from '../../../app/models/activity';
 
-interface Props {
-  activities: Activity[];
-  selectedActivity: Activity | undefined;
-  handleSelectedActivity: (id: string) => void;
-  handleDeleteActivity: (id: string) => void;
-  submitting: boolean;
-}
-export default function ActivityList({
-  activities,
-  handleSelectedActivity,
-  handleDeleteActivity,
-  submitting,
-}: Props) {
+import { useStore } from '../../../app/stores/store';
+
+export default observer(function ActivityList() {
+  const { activityStore } = useStore();
+  const {
+    activitiesByDate: activities,
+    deleteActivity,
+    loading,
+  } = activityStore;
   const [target, setTarget] = useState('');
-  const deleteActivity = (
+  const handleDeleteActivity = (
     event: SyntheticEvent<HTMLButtonElement>,
     id: string
   ) => {
     setTarget(event.currentTarget.name);
-    handleDeleteActivity(id);
+    deleteActivity(id);
   };
+
   return (
     <>
       <Segment>
@@ -41,7 +38,7 @@ export default function ActivityList({
                 <Item.Extra>
                   <Button
                     href='#detail'
-                    onClick={() => handleSelectedActivity(activity.id)}
+                    onClick={() => activityStore.selectActivity(activity.id)}
                     floated='right'
                     content='view'
                     color='blue'
@@ -49,8 +46,8 @@ export default function ActivityList({
                   <Button
                     name={activity.id}
                     href='#detail'
-                    loading={submitting && target === activity.id}
-                    onClick={(e) => deleteActivity(e, activity.id)}
+                    loading={loading && target === activity.id}
+                    onClick={(e) => handleDeleteActivity(e, activity.id)}
                     floated='right'
                     content='delete'
                     color='red'
@@ -64,4 +61,4 @@ export default function ActivityList({
       </Segment>
     </>
   );
-}
+});

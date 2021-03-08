@@ -1,21 +1,20 @@
-import React, { ChangeEvent, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { ChangeEvent, useState } from 'react';
 import { Button, Form, Segment } from 'semantic-ui-react';
-import { Activity } from '../../../app/models/activity';
 
-interface Props {
-  handleFormClose: () => void;
-  activity: Activity | undefined;
-  handleCreateOrEditActivity: (activity: Activity) => void;
-  submitting: boolean;
-}
+import { useStore } from '../../../app/stores/store';
 
-export default function ActivityForm({
-  handleFormClose,
-  activity: SelectedActivity,
-  handleCreateOrEditActivity,
-  submitting,
-}: Props) {
-  const initialState = SelectedActivity ?? {
+export default observer(function ActivityForm() {
+  const { activityStore } = useStore();
+  const {
+    selectedActivity,
+    closeForm,
+    createActivity,
+    updateActivity,
+    loading,
+  } = activityStore;
+
+  const initialState = selectedActivity ?? {
     id: '',
     title: '',
     date: '',
@@ -24,11 +23,14 @@ export default function ActivityForm({
     city: '',
     venue: '',
   };
+
   const [activity, setActivity] = useState(initialState);
+
   const handleForm = (event: any) => {
     event.preventDefault();
-    handleCreateOrEditActivity(activity);
+    activity.id ? updateActivity(activity) : createActivity(activity);
   };
+
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -82,14 +84,14 @@ export default function ActivityForm({
           onChange={handleInputChange}
         />
         <Button
-          loading={submitting}
+          loading={loading}
           floated='right'
           type='submit'
           content='submit'
           color='yellow'
         />
         <Button
-          onClick={handleFormClose}
+          onClick={closeForm}
           type='button'
           content='cancel'
           color='grey'
@@ -97,4 +99,4 @@ export default function ActivityForm({
       </Form>
     </Segment>
   );
-}
+});
