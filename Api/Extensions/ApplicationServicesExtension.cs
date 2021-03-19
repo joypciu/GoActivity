@@ -20,7 +20,7 @@ namespace Api.Extensions
             services.AddDbContext<DataContext>(options => options.UseSqlite(config.GetConnectionString("dbConnection")));
             services.AddCors(options => {
                options.AddPolicy(name:"cors",builder => {
-                   builder.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                   builder.WithOrigins("http://localhost:3000","http://localhost:3001").AllowAnyHeader().AllowAnyMethod();
                });
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
