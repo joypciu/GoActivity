@@ -1,13 +1,14 @@
 import { Activity } from './../models/activity';
 import { makeAutoObservable, runInAction } from 'mobx';
 import agent from '../api/agent';
+import { format } from 'date-fns';
 
 export default class ActivityStore {
   activityRegistry = new Map<string, Activity>();
   selectedActivity: Activity | undefined = undefined;
   editMode = false;
   loading = false;
-  loadingInitial = true;
+  loadingInitial = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -15,17 +16,19 @@ export default class ActivityStore {
 
   get activitiesByDate() {
     return Array.from(this.activityRegistry.values()).sort(
-      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+      (a, b) => a.date!.getTime() - b.date!.getTime()
     );
   }
-  get groupedActivities (){
+  get groupedActivities() {
     return Object.entries(
       this.activitiesByDate.reduce((activities, activity) => {
-        const date = activity.date;
-        activities[date] = activities[date] ? [...activities[date],activity] : [activity];
+        const date = format(activity.date!, 'dd MMM yyyy h:mm aa');
+        activities[date] = activities[date]
+          ? [...activities[date], activity]
+          : [activity];
         return activities;
-      },{} as {[key: string]: Activity []})
-    )
+      }, {} as { [key: string]: Activity[] })
+    );
   }
 
   loadActivities = async () => {
@@ -62,7 +65,7 @@ export default class ActivityStore {
   };
   private setActivity = (activity: Activity | undefined) => {
     if (activity) {
-      activity.date = activity.date.split('T')[0];
+      activity.date = new Date(activity.date!);
       this.setActivityInRegistry(activity);
     } else {
       throw new Error('activity is somehow undefined.check activity store.');
