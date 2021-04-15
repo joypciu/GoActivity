@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using persistence;
 using MediatR;
 using application.Activities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers
 {
@@ -22,6 +23,7 @@ namespace Api.Controllers
             return HandleResult(activities);
            
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivity(Guid id)
         {
